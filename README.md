@@ -813,7 +813,9 @@ resource "kubernetes_cluster_role_binding" "iam_roles_developers" {
 
 ### Load Balancer
 
-The next thing we are creating is an [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) (ALB) to handle HTTP requests to our services. We will use the [AWS Load Balancer](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/) Controller service deployed using Helm.
+A próxima coisa que estamos criando é um [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) (ALB) para lidar com solicitações HTTP para nossos serviços. 
+
+Usaremos o serviço AWS Load Balancer Controller implantado usando o Helm.
 
 ingress.tf
 ```ssh

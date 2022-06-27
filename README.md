@@ -516,31 +516,31 @@ variables.tf
 ```ssh
 variable "eks_managed_node_groups" {
   type        = map(any)
-  description = "Map of EKS managed node group definitions to create"
+  description = "Mapa de definições de grupos de nós gerenciados do EKS para criar"
 }
 variable "autoscaling_average_cpu" {
   type        = number
-  description = "Average CPU threshold to autoscale EKS EC2 instances."
+  description = "Limite médio de CPU para dimensionar automaticamente instâncias do EKS EC2."
 }
 variable "cluster_name" {
   type        = string
-  description = "EKS cluster name."
+  description = "Nome do cluster EKS."
 }
 variable "name_prefix" {
   type        = string
-  description = "Prefix to be used on each infrastructure object Name created in AWS."
+  description = "Prefixo a ser usado em cada nome de objeto de infraestrutura criado na AWS."
 }
 variable "main_network_block" {
   type        = string
-  description = "Base CIDR block to be used in our VPC."
+  description = "Bloco CIDR base a ser usado em nossa VPC."
 }
 variable "subnet_prefix_extension" {
   type        = number
-  description = "CIDR block bits extension to calculate CIDR blocks of each subnetwork."
+  description = "Extensão de bits de bloco CIDR para calcular blocos CIDR de cada sub-rede."
 }
 variable "zone_offset" {
   type        = number
-  description = "CIDR block bits extension offset to calculate Public subnets, avoiding collisions with Private subnets."
+  description = "Deslocamento de extensão de bits de bloco CIDR para calcular sub-redes públicas, evitando colisões com sub-redes privadas."
 }
 ```
 
@@ -973,92 +973,92 @@ variables.tf
 ```ssh
 ariable "cluster_name" {
   type        = string
-  description = "EKS cluster name."
+  description = "Nome do cluster EKS."
 }
 variable "spot_termination_handler_chart_name" {
   type        = string
-  description = "EKS Spot termination handler Helm chart name."
+  description = "Nome do Chart Helm do manipulador de terminação do EKS Spot."
 }
 variable "spot_termination_handler_chart_repo" {
   type        = string
-  description = "EKS Spot termination handler Helm repository name."
+  description = "Nome do repositório Helm do manipulador de encerramento do EKS Spot."
 }
 variable "spot_termination_handler_chart_version" {
   type        = string
-  description = "EKS Spot termination handler Helm chart version."
+  description = "Versão do Chart Helm do manipulador de terminação do EKS Spot."
 }
 variable "spot_termination_handler_chart_namespace" {
   type        = string
-  description = "Kubernetes namespace to deploy EKS Spot termination handler Helm chart."
+  description = "Namespace do Kubernetes para implantar o gráfico Helm do manipulador de terminação do EKS Spot."
 }
 
 # cria algumas variáveis
 variable "external_dns_iam_role" {
   type        = string
-  description = "IAM Role Name associated with external-dns service."
+  description = "Nome da função do IAM associado ao serviço de DNS externo."
 }
 variable "external_dns_chart_name" {
   type        = string
-  description = "Chart Name associated with external-dns service."
+  description = "Nome do gráfico associado ao serviço de DNS externo."
 }
 
 variable "external_dns_chart_repo" {
   type        = string
-  description = "Chart Repo associated with external-dns service."
+  description = "Gráfico de repositório associado ao serviço de DNS externo."
 }
 
 variable "external_dns_chart_version" {
   type        = string
-  description = "Chart Repo associated with external-dns service."
+  description = "Chart do repositório associado ao serviço de DNS externo."
 }
 
 variable "external_dns_values" {
   type        = map(string)
-  description = "Values map required by external-dns service."
+  description = "Mapa de valores exigido pelo serviço externo-dns."
 }
 
 variable "name_prefix" {
   type        = string
-  description = "Prefix to be used on each infrastructure object Name created in AWS."
+  description = "Prefixo a ser usado em cada nome de objeto de infraestrutura criado na AWS."
 }
 variable "admin_users" {
   type        = list(string)
-  description = "List of Kubernetes admins."
+  description = "Lista de administradores do Kubernetes."
 }
 variable "developer_users" {
   type        = list(string)
-  description = "List of Kubernetes developers."
+  description = "Lista de desenvolvedores do Kubernetes."
 }
 
 variable "dns_hosted_zone" {
   type        = string
-  description = "DNS Zone name to be used from EKS Ingress."
+  description = "Nome da zona DNS a ser usado do EKS Ingress."
 }
 variable "load_balancer_name" {
   type        = string
-  description = "Load-balancer service name."
+  description = "Nome do serviço do balanceador de carga."
 }
 variable "alb_controller_iam_role" {
   type        = string
-  description = "IAM Role Name associated with load-balancer service."
+  description = "Nome da função do IAM associado ao serviço do balanceador de carga."
 }
 variable "alb_controller_chart_name" {
   type        = string
-  description = "AWS Load Balancer Controller Helm chart name."
+  description = "Nome do gráfico do Helm do AWS Load Balancer Controller."
 }
 variable "alb_controller_chart_repo" {
   type        = string
-  description = "AWS Load Balancer Controller Helm repository name."
+  description = "Nome do repositório Helm do AWS Load Balancer Controller."
 }
 variable "alb_controller_chart_version" {
   type        = string
-  description = "AWS Load Balancer Controller Helm chart version."
+  description = "Versão do gráfico Helm do AWS Load Balancer Controller."
 }
 
 # cria algumas variáveis
 variable "namespaces" {
   type        = list(string)
-  description = "List of namespaces to be created in our EKS Cluster."
+  description = "Lista de namespaces a serem criados em nosso cluster EKS."
 }
 ```
 
@@ -1175,11 +1175,11 @@ module "config" {
   spot_termination_handler_chart_version   = var.spot_termination_handler_chart_version
   spot_termination_handler_chart_namespace = var.spot_termination_handler_chart_namespace
   dns_hosted_zone                          = var.dns_hosted_zone
-  load_balancer_name                     = var.load_balancer_name
-  alb_controller_iam_role                 = var.alb_controller_iam_role
-  alb_controller_chart_name               = var.alb_controller_chart_name
-  alb_controller_chart_repo               = var.alb_controller_chart_repo
-  alb_controller_chart_version            = var.alb_controller_chart_version
+  load_balancer_name                       = var.load_balancer_name
+  alb_controller_iam_role                  = var.alb_controller_iam_role
+  alb_controller_chart_name                = var.alb_controller_chart_name
+  alb_controller_chart_repo                = var.alb_controller_chart_repo
+  alb_controller_chart_version             = var.alb_controller_chart_version
   external_dns_iam_role                    = var.external_dns_iam_role
   external_dns_chart_name                  = var.external_dns_chart_name
   external_dns_chart_repo                  = var.external_dns_chart_repo
@@ -1319,6 +1319,6 @@ Neste ponto, temos um cluster EKS de nível de produção.
 
 O cluster agora está pronto para hospedar aplicativos.
 
-É isso por enquanto. 
+### É isso por enquanto. 
 
 Quando você terminar e não quiser deixar o cluster EKS em execução, o que eu recomendo para evitar ser cobrado pela AWS, você pode primeiro acionar o trabalho de desinstalação do HELM e, em seguida, acionar o trigger de destruição.

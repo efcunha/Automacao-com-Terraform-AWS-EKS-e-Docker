@@ -76,7 +76,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "4.11.0" # Optional but recommended in production
+      version = "4.11.0" # Opcional, mas recomendado em produção
     }
   }
 
@@ -95,7 +95,7 @@ bucket               = "devops-demo.tfstate"
 key                  = "infra.json"
 region               = "eu-west-1"
 workspace_key_prefix = "environment"
-dynamodb_table = "devops-demo.tfstate.lock"
+dynamodb_table       = "devops-demo.tfstate.lock"
 ```
 
 ✅ Recomendação: É aconselhável bloquear o [estado](https://www.terraform.io/language/state/locking#state-locking) do seu backend para evitar que outros adquiram o bloqueio e potencialmente corrompam seu estado, especialmente ao executar isso em um pipeline CI/CD. Estamos usando o Amazon [DynamoDB](https://aws.amazon.com/dynamodb/?trk=2431813f-f7fb-4215-a32b-dc6bb102214d&sc_channel=ps&sc_campaign=acquisition&sc_medium=ACQ-P|PS-GO|Brand|Desktop|SU|Database|DynamoDB|EEM|EN|Text|Non-EU&s_kwcid=AL!4422!3!536452473269!e!!g!!aws%20dynamodb&ef_id=Cj0KCQjw2MWVBhCQARIsAIjbwoPpmxOYkOtYKyWGe7vK495lxUp9J2QS_gWIYWnmmrYQuXAg9oIoDNIaAsbnEALw_wcB:G:s&s_kwcid=AL!4422!3!536452473269!e!!g!!aws%20dynamodb) para isso.

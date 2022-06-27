@@ -152,7 +152,9 @@ docker-compose -f docker-compose.yaml run --rm terraform init -backend-config=co
 docker-compose -f docker-compose.yml run --rm terraform workspace select development
 ```
 
-Até este ponto, estamos prontos para começar a escrever nossa infraestrutura como código 😀. Faça uma pausa e pegue um café ☕️.
+Até este ponto, estamos prontos para começar a escrever nossa infraestrutura como código 😀. 
+
+Faça uma pausa e pegue um café ☕️.
 
 Vamos começar a codificar nosso módulo base. Começaremos com a criação da VPC
 

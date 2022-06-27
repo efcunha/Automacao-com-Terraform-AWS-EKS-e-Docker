@@ -1,7 +1,7 @@
 # Automação com Terraform, AWS e Docker 
 ### Crie um cluster EKS de nível de produção com o Terraform
 
-https://miro.medium.com/max/1400/1*FL83CEzVcducCEP80rGjbg.png
+[https://miro.medium.com/max/1400/1*FL83CEzVcducCEP80rGjbg.png]
 
 ### Arquitetura:
 
@@ -69,7 +69,7 @@ A primeira coisa que devemos criar é a [configuração do provedor](https://www
 As configurações do Terraform devem declarar quais provedores são necessários para que o Terraform possa instalá-los e usá-los.
 
 proveider.tf
----sh
+```ssh
 terraform {
   required_version = "1.1.9"
 
@@ -81,7 +81,7 @@ terraform {
   }
 
 }
----
+```
 
 ✅ Recomendação: É uma boa ideia declarar a versão do Terraform a ser usada para evitar quaisquer alterações que possam afetar nossa infraestrutura se usarmos versões mais recentes/antigas ao executar o Terraform no futuro.
 
@@ -90,21 +90,21 @@ terraform {
 ✅ Recomendação: A configuração do backend é a [Configuração Parcial](https://www.terraform.io/language/settings/backends/configuration#partial-configuration). Precisamos disso configurado para que possamos ter vários arquivos por ambiente (staging, development, prod) se necessário. Isso nos permitirá ter vários arquivos de estado para cada espaço de trabalho do Terraform:✅ Recommendation: Backend configuration is Partial Configuration. We need this set up so that we can have several files per environment(staging, development, prod) if required. This will enable us to have several state files for each Terraform workspace:
 
 backend.tfvars
----sh
+```ssh
 bucket               = "devops-demo.tfstate"
 key                  = "infra.json"
 region               = "eu-west-1"
 workspace_key_prefix = "environment"
 dynamodb_table = "devops-demo.tfstate.lock"
----
+```
 
 ✅ Recomendação: É aconselhável bloquear o [estado](https://www.terraform.io/language/state/locking#state-locking) do seu backend para evitar que outros adquiram o bloqueio e potencialmente corrompam seu estado, especialmente ao executar isso em um pipeline CI/CD. Estamos usando o Amazon [DynamoDB](https://aws.amazon.com/dynamodb/?trk=2431813f-f7fb-4215-a32b-dc6bb102214d&sc_channel=ps&sc_campaign=acquisition&sc_medium=ACQ-P|PS-GO|Brand|Desktop|SU|Database|DynamoDB|EEM|EN|Text|Non-EU&s_kwcid=AL!4422!3!536452473269!e!!g!!aws%20dynamodb&ef_id=Cj0KCQjw2MWVBhCQARIsAIjbwoPpmxOYkOtYKyWGe7vK495lxUp9J2QS_gWIYWnmmrYQuXAg9oIoDNIaAsbnEALw_wcB:G:s&s_kwcid=AL!4422!3!536452473269!e!!g!!aws%20dynamodb) para isso.
 
 ⚠️Importante: o bucket do S3 e a tabela do DynamoDB precisam existir antes de executar o comando terraform init. Eles não serão criados pelo Terraform se não existirem na AWS. Você pode criar um bucket manualmente ou por meio de uma ferramenta CI/CD executando um comando como este:
 
----sh
+```ssh
 aws s3 mb s3://my-iac-bucket-name --region eu-west-1
----
+```
 
 Os nomes dos buckets devem ser exclusivos. Leia mais [aqui](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html).
 
@@ -117,7 +117,7 @@ O Terraform os usará automaticamente para autenticar em APIs da AWS.
 Usaremos o docker com este arquivo docker-compose para executar nossos comandos do Terraform.
 
 docker-compose.yml
----sh
+```ssh
 version: '3.7'
 
 services:
@@ -130,7 +130,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
----
+```
 
 Como mencionamos acima, usaremos o aws-vault para armazenar e acessar com segurança as credenciais da AWS em nosso ambiente de desenvolvimento.
 
@@ -140,17 +140,17 @@ Como mencionamos acima, usaremos o [Terraform Workspaces](https://www.terraform.
 
 Para inicializar cada workspace, devemos executar este comando:
 
----sh
+```ssh
 docker-compose -f docker-compose.yml run --rm terraform init -backend-config=config-backend.tfvars
 docker-compose -f docker-compose.yml run --rm terraform workspace new development
----
+```
 
 Com este workspace, se quisermos executar comandos do Terraform no mesmo workspace ou alternar o workspace, podemos fazer isso executando este comando:
 
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform init -backend-config=config-backend.tfvars
 docker-compose -f docker-compose.yml run --rm terraform workspace select development
----
+```
 
 Até este ponto, estamos prontos para começar a escrever nossa infraestrutura como código 😀. Faça uma pausa e pegue um café ☕️.
 
@@ -163,14 +163,14 @@ Vamos começar criando uma nova [VPC](https://docs.aws.amazon.com/vpc/latest/use
 Para isso, usamos o [módulo terraform oficial](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) da AWS VPC. Estaremos usando a v3.14.0, que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
 
 data.tf
----sh
+```ssh
 data "aws_availability_zones" "available_azs" {
   state = "available"
 }
----
+```
 
 network.tf
----sh
+```ssh
 # Reserve Elastic IP to be used in our NAT gateway
 resource "aws_eip" "nat_gw_eip" {
   vpc = true
@@ -329,7 +329,7 @@ resource "aws_security_group" "alb" {
     "Name" = "${var.name_prefix}-alb"
   }
 }
----
+```
 
 Criaremos uma nova VPC com sub-redes em cada zona de disponibilidade com um único gateway NAT.
 
@@ -346,7 +346,7 @@ Estamos usando o [módulo terraform oficial](https://registry.terraform.io/modul
 Estaremos usando v18.21.0 com ~>(Verifique a [sintaxe de restrições de versão](https://www.terraform.io/language/expressions/version-constraints#version-constraint-syntax)), que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
 
 eks.tf
----sh
+```ssh
 module "eks-cluster" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 18.20.2"
@@ -448,10 +448,10 @@ resource "aws_autoscaling_policy" "eks_autoscaling_policy" {
     target_value = var.autoscaling_average_cpu
   }
 }
----
+```
 
 asg.tf
----sh
+```ssh
 resource "aws_autoscaling_policy" "eks_autoscaling_policy" {
   count = length(var.eks_managed_node_groups)
 
@@ -466,7 +466,7 @@ resource "aws_autoscaling_policy" "eks_autoscaling_policy" {
     target_value = var.autoscaling_average_cpu
   }
 }
----
+```
 
 Estamos criando o EKS Cluster que usa o EC2 Autoscaling Group for Kubernetes. O EC2 é composto por instâncias spot e sob demanda com escalonamento automático para cima/para baixo com base no uso médio da CPU.
 
@@ -475,7 +475,7 @@ Estamos criando o EKS Cluster que usa o EC2 Autoscaling Group for Kubernetes. O 
 Precisamos definir algumas funções do IAM para Load Balancer Controller e DNS externo e anexá-las ao [EKS OIDC](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts-technical-overview.html) como mencionamos no início. Estamos usando o [módulo Função do IAM](https://registry.terraform.io/modules/terraform-aws-modules/iam/aws/latest/submodules/iam-role-for-service-accounts-eks) para conta de serviço para fazer isso.
 
 iam.tf
----sh
+```ssh
 # cria a função do IAM para o AWS Load Balancer Controller e anexa ao EKS OIDC
 module "eks_ingress_iam" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -508,12 +508,12 @@ module "eks_external_dns_iam" {
     }
   }
 }
----
+```
 
 Como você pode ver, esses blocos do Terraform usam algumas variáveis. Precisamos definir e criar seus valores correspondentes.
 
 variables.tf
----sh
+```ssh
 variable "eks_managed_node_groups" {
   type        = map(any)
   description = "Map of EKS managed node group definitions to create"
@@ -542,12 +542,12 @@ variable "zone_offset" {
   type        = number
   description = "CIDR block bits extension offset to calculate Public subnets, avoiding collisions with Private subnets."
 }
----
+```
 
 Agora que temos nosso módulo base pronto, estamos prontos para criar nosso cluster EKS. Antes de podermos aplicar isso, precisamos definir alguns valores para essas variáveis.
 
 base-develop,emt.tfvars
----sh
+```ssh
 cluster_name            = "devops-demo-eks-cluster"
 iac_environment_tag     = "development"
 name_prefix             = "devops-demo-development"
@@ -586,12 +586,12 @@ eks_managed_node_groups = {
     }]
   }
 }
----
+```
 
 Neste ponto, podemos organizar todas essas configurações em um módulo e, em seguida, executar os comandos de fluxo de trabalho do Terraform.
 
 main.tf
----sh
+```ssh
 module "base" {
   source = "./base/"
 
@@ -603,36 +603,36 @@ module "base" {
   eks_managed_node_groups = var.eks_managed_node_groups
   autoscaling_average_cpu = var.autoscaling_average_cpu
 }
----
+```
 
 A primeira coisa a fazer é ter certeza de que estamos no workspace correto e validar nossa configuração executando os seguintes comandos:
 
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform workspace select development
 docker-compose -f docker-compose.yaml run --rm terraform validate
----
+```
 
 Depois disso, obtemos a saída do nosso plano executando o seguinte comando.
 
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform plan -out=development.tfplan -var-file=base-network-development.tfvars
----
+```
 
 Isso deve imprimir a saída do plano e nos fornecer os detalhes do que nossa configuração fornecerá quando aplicarmos.
 
 Com tudo parecendo bem, podemos aplicar a saída do plano executando o seguinte comando:
 
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform apply development.tfplan
----
+```
 
 Feito a aplicação, temos um novo cluster EKS na AWS. Agora que terminamos de criar o cluster, podemos prosseguir com a configuração do cluster.
 
 ⚠️Importante: Se você quiser fazer uma pausa neste momento ou não quiser deixar a infraestrutura funcionando antes de passar para a próxima etapa, você pode destruir toda a infraestrutura executando os seguintes comandos:
 
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform destroy -var-file=base-network-development.tfvars
----
+```
 
 Dica: Se você não quiser digitar yes ou confirmar toda vez que executar os comandos apply/destroy, você pode adicionar -auto-approve no final desses comandos.
 
@@ -643,7 +643,7 @@ Como mencionamos no início, usaremos um módulo diferente para configurar o clu
 Primeiro criamos o arquivo de configuração do provedor que inclui todos os provedores necessários (AWS, kubernetes, helm etc).
 
 version.tf
----sh
+```ssh
 terraform {
   required_version = "1.1.9"
 
@@ -666,10 +666,10 @@ terraform {
     }
   }
 }
----
+```
 
 eks.tf
----sh
+```ssh
 # Obtenha informações do cluster EKS para configurar provedores Kubernetes e Helm
 data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
@@ -701,7 +701,7 @@ resource "helm_release" "spot_termination_handler" {
   namespace     = var.spot_termination_handler_chart_namespace
   wait_for_jobs = true
 }
----
+```
 
 Nesta configuração, estamos fazendo duas coisas principais:
 
@@ -714,12 +714,12 @@ Nesta configuração, estamos fazendo duas coisas principais:
 A próxima etapa é configurar o acesso ao IAM necessário para usuários da AWS que entram em nosso cluster EKS usando o [ConfigMap](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) aws-auth.
 
 data.tf
----sh
+```ssh
 data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
----
+```
 
 iam.tf
----sh
+```ssh
 # Crie mapas de usuários de administradores e desenvolvedores
 locals {
   admin_user_map_users = [
@@ -809,14 +809,14 @@ resource "kubernetes_cluster_role_binding" "iam_roles_developers" {
     }
   }
 }
----
+```
 
 ### Load Balancer
 
 The next thing we are creating is an [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) (ALB) to handle HTTP requests to our services. We will use the [AWS Load Balancer](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/) Controller service deployed using Helm.
 
 ingress.tf
----sh
+```ssh
 # Obtém a zona hospedada de DNS
 # ATENÇÃO: se você ainda não possui uma Zona Route53, substitua esses dados por um novo recurso
 data "aws_route53_zone" "hosted_zone" {
@@ -895,7 +895,7 @@ resource "helm_release" "ingress_gateway" {
     value = "false"
   }
 }
----
+```
 
 Na definição acima, usamos um novo certificado SSL emitido pela AWS para fornecer HTTPS em nosso ALB para ser colocado na frente de nossos pods do Kubernetes. Também definimos algumas anotações exigidas pelo serviço [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/).
 
@@ -906,7 +906,7 @@ Na definição acima, usamos um novo certificado SSL emitido pela AWS para forne
 O próximo componente a ser implantado é o serviço [DNS externo](https://github.com/kubernetes-sigs/external-dns) que será responsável por sincronizar nossos serviços e entradas expostos do Kubernetes e gerenciar nossos registros do Route53.
 
 external-dns.tf
----sh
+```ssh
 # deploy 'external-dns' service
 # https://github.com/kubernetes-sigs/external-dns
 resource "helm_release" "external_dns" {
@@ -942,7 +942,7 @@ resource "helm_release" "external_dns" {
     value = data.aws_route53_zone.base_domain.zone_id
   }
 }
----
+```
 
 O Helm chart de comando de DNS externo do Kubernetes requer algumas anotações para o novo [certificado ACM](https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html) gerado para fornecer conexões SSL e também para criar/modificar/excluir registros no domínio base do Route53.
 
@@ -951,7 +951,7 @@ O Helm chart de comando de DNS externo do Kubernetes requer algumas anotações 
 Agora terminamos de criar os componentes obrigatórios. Para manter nossa implantação limpa e separada, podemos definir alguns namespaces do Kubernetes para nos ajudar a ter melhor gerenciamento e visibilidade em nosso cluster.
 
 namespaces.tf
----sh
+```ssh
 # Cria namespaces no EKS
 resource "kubernetes_namespace" "eks_namespaces" {
   for_each = toset(var.namespaces)
@@ -963,12 +963,12 @@ resource "kubernetes_namespace" "eks_namespaces" {
     name = each.key
   }
 }
----
+```
 
 A parte final é definir a variável necessária para essas configurações e seus valores.
 
 variables.tf
----sh
+```ssh
 ariable "cluster_name" {
   type        = string
   description = "EKS cluster name."
@@ -1058,10 +1058,10 @@ variable "namespaces" {
   type        = list(string)
   description = "List of namespaces to be created in our EKS Cluster."
 }
----
+```
 
 config-developement.tfvars
----sh
+```ssh
 spot_termination_handler_chart_name      = "aws-node-termination-handler"
 spot_termination_handler_chart_repo      = "https://aws.github.io/eks-charts"
 spot_termination_handler_chart_version   = "0.18.1"
@@ -1095,7 +1095,7 @@ alb_controller_chart_repo    = "https://aws.github.io/eks-charts"
 alb_controller_chart_version = "1.4.1"
 
 namespaces = ["dev"]
----
+```
 
 Por favor, altere o valor do dns_base_domain para um domínio que você possui e tem acesso.
 
@@ -1104,7 +1104,7 @@ Por favor, altere o valor do dns_base_domain para um domínio que você possui e
 Agora que terminamos de criar todas as configurações necessárias, vamos agrupá-las em um módulo. Primeiro, precisamos criar a configuração do provedor e o manifesto de dados.
 
 versions.tf
----sh
+```ssh
 terraform {
   required_version = "1.1.9"
 
@@ -1139,17 +1139,17 @@ provider "aws" {
     }
   }
 }
----
+```
 
 data.tf
----sh
+```ssh
 data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
----
+```
 
 Veja como é o módulo principal:
 
 main.tf
----sh
+```ssh
 # módulo para criar o cluster
 module "base" {
   source = "./base/"
@@ -1188,12 +1188,12 @@ module "config" {
   admin_users                              = var.admin_users
   developer_users                          = var.developer_users
 }
----
+```
 
 E também as variáveis necessárias:
 
 variables.tf
----sh
+```ssh
 # for base/network.tf
 variable "cluster_name" {
   type        = string
@@ -1299,20 +1299,20 @@ variable "developer_users" {
   type        = list(string)
   description = "Lista de desenvolvedores do Kubernetes."
 }
----
+```
 
 Agora estamos prontos para executar os comandos do terraform. Selecione a área de trabalho.
 
 Antes de executarmos o plano e aplicarmos os comandos, precisamos formatar e validar nossa configuração para garantir que ela esteja em formato e estilo canônicos e válida.
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform fmt
 docker-compose -f docker-compose.yaml run --rm terraform validate
----
+```
 Após a confirmação de que tudo está correto, agora vamos planejar e aplicar
----sh
+```ssh
 docker-compose -f docker-compose.yaml run --rm terraform plan -out=development.tfplan -var-file=base-development.tfvars -var-file=config-development.tfvars
 docker-compose -f docker-compose.yaml run --rm terraform apply development.tfplan
----
+```
 Neste ponto, temos um cluster EKS de nível de produção. 
 
 O cluster agora está pronto para hospedar aplicativos.

@@ -1,7 +1,7 @@
 # Automação com Terraform, AWS e Docker 
 ### Crie um cluster EKS de nível de produção com o Terraform
 
-[https://miro.medium.com/max/1400/1*FL83CEzVcducCEP80rGjbg.png]
+![Terraform](https://miro.medium.com/max/1400/1*FL83CEzVcducCEP80rGjbg.png)
 
 ### Arquitetura:
 
@@ -154,9 +154,11 @@ docker-compose -f docker-compose.yml run --rm terraform workspace select develop
 
 Até este ponto, estamos prontos para começar a escrever nossa infraestrutura como código 😀. 
 
-Faça uma pausa e pegue um café ☕️.
+### Faça uma pausa e pegue um café ☕️.
 
-Vamos começar a codificar nosso módulo base. Começaremos com a criação da VPC
+Vamos começar a codificar nosso módulo base. 
+
+Começaremos com a criação da VPC
 
 ### Criação de componentes de rede e VPC
 

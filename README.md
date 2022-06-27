@@ -173,7 +173,7 @@ data "aws_availability_zones" "available_azs" {
 
 network.tf
 ```ssh
-# Reserve Elastic IP to be used in our NAT gateway
+# Reserve Elastic IP para ser usado em nosso gateway NAT
 resource "aws_eip" "nat_gw_eip" {
   vpc = true
 

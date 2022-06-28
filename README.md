@@ -1149,7 +1149,7 @@ provider "aws" {
 
 data.tf
 ```ssh
-data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
+data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
 ```
 
 Veja como é o módulo principal:

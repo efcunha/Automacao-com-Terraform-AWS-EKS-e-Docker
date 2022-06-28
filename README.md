@@ -141,14 +141,14 @@ Como mencionamos acima, usaremos o [Terraform Workspaces](https://www.terraform.
 Para inicializar cada workspace, devemos executar este comando:
 
 ```ssh
-docker-compose -f docker-compose.yml run --rm terraform init -backend-config=config-backend.tfvars
+docker-compose -f docker-compose.yml run --rm terraform init -backend-config=backend.tfvars
 docker-compose -f docker-compose.yml run --rm terraform workspace new development
 ```
 
 Com este workspace, se quisermos executar comandos do Terraform no mesmo workspace ou alternar o workspace, podemos fazer isso executando este comando:
 
 ```ssh
-docker-compose -f docker-compose.yml run --rm terraform init -backend-config=config-backend.tfvars
+docker-compose -f docker-compose.yml run --rm terraform init -backend-config=backend.tfvars
 docker-compose -f docker-compose.yml run --rm terraform workspace select development
 ```
 

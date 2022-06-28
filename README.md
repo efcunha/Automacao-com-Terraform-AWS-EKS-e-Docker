@@ -60,6 +60,7 @@ Portanto, esteja ciente disso antes de aplicar o Terraform! Você também pode c
 ### Provedor de configuração com Terraform:
 
 Após uma breve introdução, vamos entrar em nossa infraestrutura como código! Veremos trechos de configuração do Terraform necessários em cada etapa.
+
 Você pode copiá-los e tentar aplicar esses planos por conta própria.
 
 Começamos criando uma pasta e abrindo a pasta em seu editor favorito.
@@ -164,7 +165,9 @@ Começaremos com a criação da VPC
 
 Vamos começar criando uma nova [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) e todos os componentes de rede necessários (sub-redes, [NAT](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html), [Elastic IP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html) etc) para isolar nossos recursos relacionados ao EKS em um local seguro.
 
-Para isso, usamos o [módulo terraform oficial](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) da AWS VPC. Estaremos usando a v3.14.0, que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
+Para isso, usamos o [módulo terraform oficial](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) da AWS VPC. 
+
+Estaremos usando a v3.14.0, que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
 
 data.tf
 ```ssh
@@ -210,8 +213,8 @@ module "vpc" {
   ]
 
   enable_nat_gateway     = true
-   # ative o Gateway NAT único para economizar algum dinheiro. Isso pode criar um único ponto de falha, pois estamos criando um Gateway NAT em apenas uma AZ
-   # sinta-se à vontade para alterar essas opções se precisar garantir a disponibilidade total
+  # ative o Gateway NAT único para economizar algum dinheiro. Isso pode criar um único ponto de falha, pois estamos criando um Gateway NAT em apenas uma AZ
+  # sinta-se à vontade para alterar essas opções se precisar garantir a disponibilidade total
   single_nat_gateway     = true
   one_nat_gateway_per_az = false
   enable_dns_hostnames   = true
@@ -337,7 +340,9 @@ resource "aws_security_group" "alb" {
 
 Criaremos uma nova VPC com sub-redes em cada zona de disponibilidade com um único gateway NAT.
 
-Estamos usando um único gateway NAT aqui para economizar custos, mas lembre-se de que isso pode criar um único ponto de falha. Você pode alterar as opções se precisar garantir a disponibilidade total criando NAT em cada uma das zonas de disponibilidade.
+Estamos usando um único gateway NAT aqui para economizar custos, mas lembre-se de que isso pode criar um único ponto de falha. 
+
+Você pode alterar as opções se precisar garantir a disponibilidade total criando NAT em cada uma das zonas de disponibilidade.
 
 Também estamos adicionando algumas das tags [exigidas pelo EKS](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
@@ -347,7 +352,9 @@ O próximo componente que vamos criar é um novo cluster Kubernetes.
 
 Estamos usando o [módulo terraform oficial](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest) do AWS EKS.
 
-Estaremos usando v18.21.0 com ~>(Verifique a [sintaxe de restrições de versão](https://www.terraform.io/language/expressions/version-constraints#version-constraint-syntax)), que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
+Estaremos usando v18.21.0 com ~>(Verifique a [sintaxe de restrições de versão](https://www.terraform.io/language/expressions/version-constraints#version-constraint-syntax)), que é a versão mais recente do módulo no momento em que escrevemos isso. 
+
+Sinta-se à vontade para mudar isso.
 
 eks.tf
 ```ssh
@@ -472,7 +479,9 @@ resource "aws_autoscaling_policy" "eks_autoscaling_policy" {
 }
 ```
 
-Estamos criando o EKS Cluster que usa o EC2 Autoscaling Group for Kubernetes. O EC2 é composto por instâncias spot e sob demanda com escalonamento automático para cima/para baixo com base no uso médio da CPU.
+Estamos criando o EKS Cluster que usa o EC2 Autoscaling Group for Kubernetes. 
+
+O EC2 é composto por instâncias spot e sob demanda com escalonamento automático para cima/para baixo com base no uso médio da CPU.
 
 ### Definir funções do IAM
 
@@ -514,7 +523,9 @@ module "eks_external_dns_iam" {
 }
 ```
 
-Como você pode ver, esses blocos do Terraform usam algumas variáveis. Precisamos definir e criar seus valores correspondentes.
+Como você pode ver, esses blocos do Terraform usam algumas variáveis. 
+
+Precisamos definir e criar seus valores correspondentes.
 
 variables.tf
 ```ssh
@@ -548,7 +559,9 @@ variable "zone_offset" {
 }
 ```
 
-Agora que temos nosso módulo base pronto, estamos prontos para criar nosso cluster EKS. Antes de podermos aplicar isso, precisamos definir alguns valores para essas variáveis.
+Agora que temos nosso módulo base pronto, estamos prontos para criar nosso cluster EKS. 
+
+Antes de podermos aplicar isso, precisamos definir alguns valores para essas variáveis.
 
 base-developemt.tfvars
 ```ssh
@@ -630,7 +643,9 @@ Com tudo parecendo bem, podemos aplicar a saída do plano executando o seguinte 
 docker-compose -f docker-compose.yaml run --rm terraform apply development.tfplan
 ```
 
-Feito a aplicação, temos um novo cluster EKS na AWS. Agora que terminamos de criar o cluster, podemos prosseguir com a configuração do cluster.
+Feito a aplicação, temos um novo cluster EKS na AWS. 
+
+Agora que terminamos de criar o cluster, podemos prosseguir com a configuração do cluster.
 
 ⚠️Importante: Se você quiser fazer uma pausa neste momento ou não quiser deixar a infraestrutura funcionando antes de passar para a próxima etapa, você pode destruir toda a infraestrutura executando os seguintes comandos:
 
@@ -642,7 +657,9 @@ Dica: Se você não quiser digitar yes ou confirmar toda vez que executar os com
 
 ### Configuração do cluster EKS
 
-Como mencionamos no início, usaremos um módulo diferente para configurar o cluster. Buscaremos os dados do EKS Cluster usando a [fonte de dados](https://www.terraform.io/language/data-sources) Terraform.
+Como mencionamos no início, usaremos um módulo diferente para configurar o cluster. 
+
+Buscaremos os dados do EKS Cluster usando a [fonte de dados](https://www.terraform.io/language/data-sources) Terraform.
 
 Primeiro criamos o arquivo de configuração do provedor que inclui todos os provedores necessários (AWS, kubernetes, helm etc).
 
@@ -903,9 +920,13 @@ resource "helm_release" "ingress_gateway" {
 }
 ```
 
-Na definição acima, usamos um novo certificado SSL emitido pela AWS para fornecer HTTPS em nosso ALB para ser colocado na frente de nossos pods do Kubernetes. Também definimos algumas anotações exigidas pelo serviço [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/).
+Na definição acima, usamos um novo certificado SSL emitido pela AWS para fornecer HTTPS em nosso ALB para ser colocado na frente de nossos pods do Kubernetes. 
 
-⚠️ Observação: esta configuração usa uma fonte de dados para buscar uma zona DNS hospedada no Route53 criada fora desta configuração do Terraform. Se você ainda não tiver um, poderá alterá-lo livremente para criar novos recursos de DNS.
+Também definimos algumas anotações exigidas pelo serviço [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/).
+
+⚠️ Observação: esta configuração usa uma fonte de dados para buscar uma zona DNS hospedada no Route53 criada fora desta configuração do Terraform. 
+
+Se você ainda não tiver um, poderá alterá-lo livremente para criar novos recursos de DNS.
 
 ### DNS externo
 
@@ -954,7 +975,9 @@ O Helm chart de comando de DNS externo do Kubernetes requer algumas anotações 
 
 ### Namespaces do Kubernetes (opcional)
 
-Agora terminamos de criar os componentes obrigatórios. Para manter nossa implantação limpa e separada, podemos definir alguns namespaces do Kubernetes para nos ajudar a ter melhor gerenciamento e visibilidade em nosso cluster.
+Agora terminamos de criar os componentes obrigatórios. 
+
+Para manter nossa implantação limpa e separada, podemos definir alguns namespaces do Kubernetes para nos ajudar a ter melhor gerenciamento e visibilidade em nosso cluster.
 
 namespaces.tf
 ```ssh
@@ -1105,9 +1128,15 @@ namespaces = ["dev"]
 
 Por favor, altere o valor do dns_base_domain para um domínio que você possui e tem acesso.
 
-⚠️Observação: os usuários do IAM exibidos acima não são reais. Você precisa alterá-los/personalizá-los de acordo com os grupos de usuários em sua conta da AWS. Esses nomes de usuário não precisam existir como identidades do AWS IAM no momento em que você está criando o cluster, pois eles ficarão apenas dentro do cluster do Kubernetes. Leia mais [aqui](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html#create-kubeconfig-automatically) para saber como a AWS CLI lida com a correlação de nome de usuário do IAM/Kubernetes.
+⚠️Observação: os usuários do IAM exibidos acima não são reais. 
 
-Agora que terminamos de criar todas as configurações necessárias, vamos agrupá-las em um módulo. Primeiro, precisamos criar a configuração do provedor e o manifesto de dados.
+Você precisa alterá-los/personalizá-los de acordo com os grupos de usuários em sua conta da AWS. 
+
+Esses nomes de usuário não precisam existir como identidades do AWS IAM no momento em que você está criando o cluster, pois eles ficarão apenas dentro do cluster do Kubernetes. Leia mais [aqui](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html#create-kubeconfig-automatically) para saber como a AWS CLI lida com a correlação de nome de usuário do IAM/Kubernetes.
+
+Agora que terminamos de criar todas as configurações necessárias, vamos agrupá-las em um módulo. 
+
+Primeiro, precisamos criar a configuração do provedor e o manifesto de dados.
 
 versions.tf
 ```ssh
@@ -1307,7 +1336,9 @@ variable "developer_users" {
 }
 ```
 
-Agora estamos prontos para executar os comandos do terraform. Selecione a área de trabalho.
+Agora estamos prontos para executar os comandos do terraform. 
+
+Selecione a área de trabalho.
 
 Antes de executarmos o plano e aplicarmos os comandos, precisamos formatar e validar nossa configuração para garantir que ela esteja em formato e estilo canônicos e válida.
 ```ssh

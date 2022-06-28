@@ -169,6 +169,13 @@ Para isso, usamos o [módulo terraform oficial](https://registry.terraform.io/mo
 
 Estaremos usando a v3.14.0, que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
 
+data.tf
+```ssh
+data "aws_availability_zones" "available_azs" {
+  state = "available"
+}
+```
+
 network.tf
 ```ssh
 # Reserve Elastic IP para ser usado em nosso gateway NAT
@@ -727,6 +734,11 @@ Nesta configuração, estamos fazendo duas coisas principais:
 
 A próxima etapa é configurar o acesso ao IAM necessário para usuários da AWS que entram em nosso cluster EKS usando o [ConfigMap](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) aws-auth.
 
+data.tf
+```ssh
+data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
+```
+
 iam.tf
 ```ssh
 # Crie mapas de usuários de administradores e desenvolvedores
@@ -1167,6 +1179,11 @@ provider "aws" {
     }
   }
 }
+```
+
+data.tf
+```ssh
+data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
 ```
 
 Veja como é o módulo principal:

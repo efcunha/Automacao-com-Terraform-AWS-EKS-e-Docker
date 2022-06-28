@@ -550,7 +550,7 @@ variable "zone_offset" {
 
 Agora que temos nosso módulo base pronto, estamos prontos para criar nosso cluster EKS. Antes de podermos aplicar isso, precisamos definir alguns valores para essas variáveis.
 
-base-develop,emt.tfvars
+base-developemt.tfvars
 ```ssh
 cluster_name            = "devops-demo-eks-cluster"
 iac_environment_tag     = "development"

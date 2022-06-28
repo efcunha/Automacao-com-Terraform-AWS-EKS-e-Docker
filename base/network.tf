@@ -121,8 +121,8 @@ resource "aws_security_group" "alb" {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"           = "1"
   }
-}
-resource "aws_security_group" "alb" {
+
+  resource "aws_security_group" "alb" {
   name   = "${var.name_prefix}-alb"
   vpc_id = module.vpc.vpc_id
 

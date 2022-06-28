@@ -1,4 +1,4 @@
-# create EKS cluster
+# Criar Cluster EKS
 module "base" {
   source = "./base/"
 

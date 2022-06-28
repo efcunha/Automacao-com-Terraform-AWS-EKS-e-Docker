@@ -1,7 +1,7 @@
-data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
+data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
 
-# get DNS Hosted Zone
-# ATTENTION: if you don't have a Route53 Zone already, replace this data by a new resource
+# obtém a zona hospedada de DNS
+# ATENÇÃO: se você ainda não possui uma Zona Route53, substitua esses dados por um novo recurso
 data "aws_route53_zone" "hosted_zone" {
   name = var.dns_hosted_zone
 }

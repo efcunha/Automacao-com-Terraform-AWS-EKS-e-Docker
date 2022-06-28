@@ -94,7 +94,7 @@ backend.tfvars
 ```ssh
 bucket               = "devops-demo.tfstate"
 key                  = "infra.json"
-region               = "eu-west-1"
+region               = "us-east-1"
 workspace_key_prefix = "environment"
 dynamodb_table       = "devops-demo.tfstate.lock"
 ```
@@ -104,7 +104,7 @@ dynamodb_table       = "devops-demo.tfstate.lock"
 ⚠️Importante: o bucket do S3 e a tabela do DynamoDB precisam existir antes de executar o comando terraform init. Eles não serão criados pelo Terraform se não existirem na AWS. Você pode criar um bucket manualmente ou por meio de uma ferramenta CI/CD executando um comando como este:
 
 ```ssh
-aws s3 mb s3://my-iac-bucket-name --region eu-west-1
+aws s3 mb s3://my-iac-bucket-name --region us.east-1
 ```
 
 Os nomes dos buckets devem ser exclusivos. Leia mais [aqui](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html).
@@ -169,13 +169,6 @@ Para isso, usamos o [módulo terraform oficial](https://registry.terraform.io/mo
 
 Estaremos usando a v3.14.0, que é a versão mais recente do módulo no momento em que escrevemos isso. Sinta-se à vontade para mudar isso.
 
-data.tf
-```ssh
-data "aws_availability_zones" "available_azs" {
-  state = "available"
-}
-```
-
 network.tf
 ```ssh
 # Reserve Elastic IP para ser usado em nosso gateway NAT
@@ -198,22 +191,23 @@ module "vpc" {
   azs  = data.aws_availability_zones.available_azs.names
 
   private_subnets = [
-    # this loop will create a one-line list as ["10.0.0.0/20", "10.0.16.0/20", "10.0.32.0/20", ...]
-    # with a length depending on how many Zones are available
+    # este loop criará uma lista de uma linha como ["10.0.0.0/20", "10.0.16.0/20", "10.0.32.0/20", ...]
+    # com um comprimento dependendo de quantas zonas estão disponíveis
     for zone_id in data.aws_availability_zones.available_azs.zone_ids :
     cidrsubnet(var.main_network_block, var.subnet_prefix_extension, tonumber(substr(zone_id, length(zone_id) - 1, 1)) - 1)
   ]
 
   public_subnets = [
-    # this loop will create a one-line list as ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", ...]
-    # with a length depending on how many Zones are available
-    # there is a zone Offset variable, to make sure no collisions are present with private subnet blocks
+    # este loop criará uma lista de uma linha como ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", ...]
+    # com um comprimento dependendo de quantas zonas estão disponíveis
+    # há uma variável de deslocamento de zona, para garantir que não haja colisões com blocos de sub-rede privados
     for zone_id in data.aws_availability_zones.available_azs.zone_ids :
     cidrsubnet(var.main_network_block, var.subnet_prefix_extension, tonumber(substr(zone_id, length(zone_id) - 1, 1)) + var.zone_offset - 1)
   ]
 
   enable_nat_gateway     = true
-  # ative o Gateway NAT único para economizar algum dinheiro. Isso pode criar um único ponto de falha, pois estamos criando um Gateway NAT em apenas uma AZ
+  # ative o Gateway NAT único para economizar algum dinheiro. 
+  # Isso pode criar um único ponto de falha, pois estamos criando um Gateway NAT em apenas uma AZ
   # sinta-se à vontade para alterar essas opções se precisar garantir a disponibilidade total
   single_nat_gateway     = true
   one_nat_gateway_per_az = false
@@ -270,7 +264,6 @@ resource "aws_security_group" "alb" {
     "Name" = "${var.name_prefix}-alb"
   }
 }
-
 
   private_subnets = [
     for zone_id in data.aws_availability_zones.available_azs.zone_ids :
@@ -734,11 +727,6 @@ Nesta configuração, estamos fazendo duas coisas principais:
 
 A próxima etapa é configurar o acesso ao IAM necessário para usuários da AWS que entram em nosso cluster EKS usando o [ConfigMap](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) aws-auth.
 
-data.tf
-```ssh
-data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
-```
-
 iam.tf
 ```ssh
 # Crie mapas de usuários de administradores e desenvolvedores
@@ -761,7 +749,7 @@ locals {
   ]
 }
 
-# Add 'mapUsers' section to 'aws-auth' configmap with Admins & Developers
+# Adicione a seção 'mapUsers' ao configmap 'aws-auth' com administradores e desenvolvedores
 resource "time_sleep" "wait" {
   create_duration = "180s"
   triggers = {
@@ -838,14 +826,19 @@ A próxima coisa que estamos criando é um [Application Load Balancer](https://d
 
 Usaremos o serviço AWS Load Balancer Controller implantado usando o Helm.
 
-ingress.tf
+data.tf
 ```ssh
-# Obtém a zona hospedada de DNS
+data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
+
+# obtém a zona hospedada de DNS
 # ATENÇÃO: se você ainda não possui uma Zona Route53, substitua esses dados por um novo recurso
 data "aws_route53_zone" "hosted_zone" {
   name = var.dns_hosted_zone
 }
+```
 
+ingress.tf
+```ssh
 # cria certificado SSL emitido pela AWS
 resource "aws_acm_certificate" "eks_domain_cert" {
   domain_name               = var.dns_hosted_zone
@@ -998,7 +991,7 @@ A parte final é definir a variável necessária para essas configurações e se
 
 variables.tf
 ```ssh
-ariable "cluster_name" {
+variable "cluster_name" {
   type        = string
   description = "Nome do cluster EKS."
 }
@@ -1113,8 +1106,8 @@ external_dns_values = {
   "sources"            = "{ingress}"
 }
 
-admin_users     = ["calvine-otieno", "jannet-kioko"]
-developer_users = ["elvis-kariuki", "peter-donald"]
+admin_users     = ["USUARIO", "USUARIO"]
+developer_users = ["USUARIO", "USUARIO"]
 
 dns_hosted_zone = "calvineotieno.com"
 load_balancer_name           = "aws-load-balancer-controller"
@@ -1167,18 +1160,13 @@ terraform {
 
 
 provider "aws" {
-  region = "eu-west-1"
+  region = "us.east-1"
   default_tags {
     tags = {
       iac_environment = var.iac_environment_tag
     }
   }
 }
-```
-
-data.tf
-```ssh
-data "aws_caller_identity" "current" {} # usado para acessar o ID da conta e o ARN
 ```
 
 Veja como é o módulo principal:

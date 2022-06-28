@@ -22,7 +22,7 @@ resource "helm_release" "external_dns" {
     value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.external_dns_iam_role}"
   }
 
-  # will make ExternalDNS see only the hosted zones matching provided domain, omit to process all available hosted zones
+  # fará com que o ExternalDNS veja apenas as zonas hospedadas correspondentes ao domínio fornecido, omitirá o processamento de todas as zonas hospedadas disponíveis
   set {
     name  = "domainFilters"
     value = "{${var.dns_hosted_zone}}"
@@ -30,6 +30,6 @@ resource "helm_release" "external_dns" {
 
   set {
     name  = "txtOwnerId"
-    value = data.aws_route53_zone.hosted_zone.zone_id
+    value = data.aws_route53_zone.base_domain.zone_id
   }
 }

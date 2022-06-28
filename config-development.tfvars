@@ -20,10 +20,10 @@ external_dns_values = {
   "sources"            = "{ingress}"
 }
 
-admin_users     = ["calvine.devops", "jannet-kioko"]
-developer_users = ["elvis-kariuki", "peter-donald"]
+admin_users     = ["USUARIO", "USUARIO"]
+developer_users = ["USUARIO", "USUARIO"]
 
-dns_hosted_zone              = "calvineotieno.com"
+dns_hosted_zone              = "devops.com"
 load_balancer_name           = "aws-load-balancer-controller"
 alb_controller_iam_role      = "load-balancer-controller"
 alb_controller_chart_name    = "aws-load-balancer-controller"

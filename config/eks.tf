@@ -1,4 +1,4 @@
-# Obtenha informações do cluster EKS para configurar provedores Kubernetes e Helm
+# get EKS cluster info to configure Kubernetes and Helm providers
 data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
@@ -6,7 +6,7 @@ data "aws_eks_cluster_auth" "cluster" {
   name = var.cluster_name
 }
 
-# Obtenha autenticação EKS para poder gerenciar objetos k8s do Terraform
+# get EKS authentication for being able to manage k8s objects from terraform
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
@@ -20,7 +20,7 @@ provider "helm" {
   }
 }
 
-# Deploy spot termination handler
+# deploy spot termination handler
 resource "helm_release" "spot_termination_handler" {
   name          = var.spot_termination_handler_chart_name
   chart         = var.spot_termination_handler_chart_name

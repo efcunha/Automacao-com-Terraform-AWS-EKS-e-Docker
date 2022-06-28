@@ -1,4 +1,4 @@
-# Crie mapas de usuários de administradores e desenvolvedores
+# create Admins & Developers user maps
 locals {
   admin_user_map_users = [
     for admin_user in var.admin_users :
@@ -18,7 +18,7 @@ locals {
   ]
 }
 
-# Add 'mapUsers' section to 'aws-auth' configmap with Admins & Developers
+# add 'mapUsers' section to 'aws-auth' configmap with Admins & Developers
 resource "time_sleep" "wait" {
   create_duration = "180s"
   triggers = {
@@ -40,7 +40,7 @@ resource "kubernetes_config_map_v1_data" "aws_auth_users" {
   depends_on = [time_sleep.wait]
 }
 
-# Crie uma função de desenvolvedor usando o RBAC
+# create developers Role using RBAC
 resource "kubernetes_cluster_role" "iam_roles_developers" {
   metadata {
     name = "${var.name_prefix}-developers"
@@ -65,7 +65,7 @@ resource "kubernetes_cluster_role" "iam_roles_developers" {
   }
 }
 
-# Vincule os usuários do desenvolvedor com sua função
+# bind developer Users with their Role
 resource "kubernetes_cluster_role_binding" "iam_roles_developers" {
   metadata {
     name = "${var.name_prefix}-developers"

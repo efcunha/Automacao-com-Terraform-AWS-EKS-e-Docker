@@ -1,10 +1,4 @@
-# Obtém a zona hospedada de DNS
-# ATENÇÃO: se você ainda não possui uma Zona Route53, substitua esses dados por um novo recurso
-data "aws_route53_zone" "hosted_zone" {
-  name = var.dns_hosted_zone
-}
-
-# cria certificado SSL emitido pela AWS
+# create AWS-issued SSL certificate
 resource "aws_acm_certificate" "eks_domain_cert" {
   domain_name               = var.dns_hosted_zone
   subject_alternative_names = ["*.${var.dns_hosted_zone}"]
@@ -28,14 +22,14 @@ resource "aws_route53_record" "domain_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.base_domain.zone_id
+  zone_id         = data.aws_route53_zone.hosted_zone.zone_id
 }
 resource "aws_acm_certificate_validation" "eks_domain_cert_validation" {
   certificate_arn         = aws_acm_certificate.eks_domain_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.domain_cert_validation : record.fqdn]
 }
 
-# cria conta de serviço lb Ingress Controller
+# create lb Ingress Controller service account
 resource "kubernetes_service_account" "lb_controller" {
   metadata {
     name      = var.load_balancer_name
@@ -47,12 +41,12 @@ resource "kubernetes_service_account" "lb_controller" {
     }
 
     annotations = {
-      "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.ingress_gateway_iam_role}"
+      "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.alb_controller_iam_role}"
     }
   }
 }
 
-# implanta o Ingress Controller
+# deploy Ingress Controller
 # https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller
 resource "helm_release" "ingress_gateway" {
   name       = var.alb_controller_chart_name

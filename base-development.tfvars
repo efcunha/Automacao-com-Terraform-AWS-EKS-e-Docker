@@ -10,7 +10,7 @@ eks_managed_node_groups = {
   "devops-eks-spot" = {
     ami_type     = "AL2_x86_64"
     min_size     = 1
-    max_size     = 16
+    max_size     = 4
     desired_size = 1
     instance_types = [
       "t3.medium",
@@ -24,7 +24,7 @@ eks_managed_node_groups = {
   "devops-eks-ondemand" = {
     ami_type     = "AL2_x86_64"
     min_size     = 1
-    max_size     = 16
+    max_size     = 4
     desired_size = 1
     instance_types = [
       "t3.medium",

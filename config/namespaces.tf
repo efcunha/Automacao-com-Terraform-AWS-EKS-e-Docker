@@ -1,4 +1,4 @@
-# Cria namespaces no EKS
+# Create Namespaces into EKS
 resource "kubernetes_namespace" "eks_namespaces" {
   for_each = toset(var.namespaces)
 

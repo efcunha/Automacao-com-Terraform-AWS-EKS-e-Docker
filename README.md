@@ -1094,7 +1094,7 @@ admin_users     = ["calvine-otieno", "jannet-kioko"]
 developer_users = ["elvis-kariuki", "peter-donald"]
 
 dns_hosted_zone = "calvineotieno.com"
-load_balancer_name       = "aws-load-balancer-controller"
+load_balancer_name           = "aws-load-balancer-controller"
 alb_controller_iam_role      = "load-balancer-controller"
 alb_controller_chart_name    = "aws-load-balancer-controller"
 alb_controller_chart_repo    = "https://aws.github.io/eks-charts"

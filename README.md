@@ -632,7 +632,7 @@ docker-compose -f docker-compose.yaml run --rm terraform validate
 Depois disso, obtemos a saída do nosso plano executando o seguinte comando.
 
 ```ssh
-docker-compose -f docker-compose.yaml run --rm terraform plan -out=development.tfplan -var-file=base-network-development.tfvars
+docker-compose -f docker-compose.yaml run --rm terraform plan -out=development.tfplan -var-file=base-development.tfvars
 ```
 
 Isso deve imprimir a saída do plano e nos fornecer os detalhes do que nossa configuração fornecerá quando aplicarmos.
@@ -650,7 +650,7 @@ Agora que terminamos de criar o cluster, podemos prosseguir com a configuração
 ⚠️Importante: Se você quiser fazer uma pausa neste momento ou não quiser deixar a infraestrutura funcionando antes de passar para a próxima etapa, você pode destruir toda a infraestrutura executando os seguintes comandos:
 
 ```ssh
-docker-compose -f docker-compose.yaml run --rm terraform destroy -var-file=base-network-development.tfvars
+docker-compose -f docker-compose.yaml run --rm terraform destroy -var-file=base-development.tfvars
 ```
 
 Dica: Se você não quiser digitar yes ou confirmar toda vez que executar os comandos apply/destroy, você pode adicionar -auto-approve no final desses comandos.

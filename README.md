@@ -88,7 +88,7 @@ terraform {
 
 ✅ Recomendação: Os provedores de recursos podem ser tratados automaticamente pelo Terraform com o comando init. No entanto, é uma boa ideia defini-los explicitamente usando números de versão da maneira que fizemos acima para evitar alterações de interrupção de fonte de dados/recurso por versões futuras.
 
-✅ Recomendação: A configuração do backend é a [Configuração Parcial](https://www.terraform.io/language/settings/backends/configuration#partial-configuration). Precisamos disso configurado para que possamos ter vários arquivos por ambiente (staging, development, prod) se necessário. Isso nos permitirá ter vários arquivos de estado para cada espaço de trabalho do Terraform:✅ Recommendation: Backend configuration is Partial Configuration. We need this set up so that we can have several files per environment(staging, development, prod) if required. This will enable us to have several state files for each Terraform workspace:
+✅ Recomendação: A configuração do backend é a [Configuração Parcial](https://www.terraform.io/language/settings/backends/configuration#partial-configuration). Precisamos disso configurado para que possamos ter vários arquivos por ambiente (staging, development, prod) se necessário. Isso nos permitirá ter vários arquivos de estado para cada espaço de trabalho do Terraform.
 
 backend.tfvars
 ```ssh
@@ -123,7 +123,7 @@ version: '3.7'
 
 services:
   terraform:
-    image: hashicorp/terraform:1.1.9
+    image: hashicorp/terraform:latest
     volumes:
       - .:/infra
     working_dir: /infra
